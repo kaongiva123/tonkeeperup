@@ -1,27 +1,30 @@
 package uikit.widget
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Outline
 import android.util.AttributeSet
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewOutlineProvider
 import android.view.WindowInsets
+import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
-import androidx.core.view.WindowInsetsCompat
-import com.tonapps.uikit.color.backgroundTransparentColor
 import com.tonapps.uikit.color.tabBarActiveIconColor
 import com.tonapps.uikit.color.tabBarInactiveIconColor
 import uikit.R
 import uikit.drawable.FooterDrawable
 import uikit.extensions.createRipple
 import uikit.extensions.getDimensionPixelSize
-import uikit.extensions.setPaddingBottom
 import uikit.extensions.setPaddingHorizontal
 import uikit.extensions.useAttributes
+import uikit.extensions.dp
 
 @SuppressLint("RestrictedApi")
 class BottomTabsView @JvmOverloads constructor(
@@ -31,14 +34,7 @@ class BottomTabsView @JvmOverloads constructor(
 ) : RowLayout(context, attrs, defStyle) {
 
     private val barHeight = context.getDimensionPixelSize(R.dimen.barHeight)
-    private var bottomOffset: Int = 0
-        set(value) {
-            if (field != value) {
-                field = value
-                setPaddingBottom(value)
-                requestLayout()
-            }
-        }
+    private val cornerRadius = 28f.dp
 
     private val drawable = FooterDrawable(context)
 
@@ -48,8 +44,9 @@ class BottomTabsView @JvmOverloads constructor(
     var selectedItemId = 0
         set(value) {
             if (field != value) {
+                val oldId = field
                 field = value
-                updateSelected()
+                animateSelection(oldId, value)
             }
         }
 
@@ -59,10 +56,32 @@ class BottomTabsView @JvmOverloads constructor(
     init {
         background = drawable
         setPaddingHorizontal(context.getDimensionPixelSize(R.dimen.offsetMedium))
+        elevation = 8f.dp
+
+        // Clip to rounded shape
+        clipToOutline = true
+        outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setRoundRect(0, 0, view.width, view.height, cornerRadius)
+            }
+        }
+
         context.useAttributes(attrs, R.styleable.BottomTabsView) {
             if (it.hasValue(R.styleable.BottomTabsView_menu)) {
                 inflateMenu(it.getResourceId(R.styleable.BottomTabsView_menu, 0))
             }
+        }
+
+        // Entrance animation
+        alpha = 0f
+        translationY = 60f.dp
+        post {
+            animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(500)
+                .setInterpolator(OvershootInterpolator(0.8f))
+                .start()
         }
     }
 
@@ -101,9 +120,6 @@ class BottomTabsView @JvmOverloads constructor(
     }
 
     override fun onApplyWindowInsets(insets: WindowInsets): WindowInsets {
-        val compatInsets = WindowInsetsCompat.toWindowInsetsCompat(insets)
-        val navigationInsets = compatInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
-        bottomOffset = navigationInsets.bottom
         return super.onApplyWindowInsets(insets)
     }
 
@@ -132,11 +148,55 @@ class BottomTabsView @JvmOverloads constructor(
             }
             addMenu(item)
         }
-
-        updateSelected()
+        updateSelected(animate = false)
     }
 
-    private fun updateSelected() {
+    private fun animateSelection(oldId: Int, newId: Int) {
+        val colorActive = context.tabBarActiveIconColor
+        val colorInactive = context.tabBarInactiveIconColor
+
+        for (i in 0 until childCount) {
+            val view = getChildAt(i)
+            val iconView = view.findViewById<ImageView>(R.id.icon)
+            val titleView = view.findViewById<TextView>(R.id.title)
+
+            when (view.tag) {
+                newId -> {
+                    // Animate selected tab: scale bounce + color
+                    iconView.imageTintList = ColorStateList.valueOf(colorActive)
+                    titleView.setTextColor(colorActive)
+
+                    val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 0.85f, 1.1f, 1.0f)
+                    val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 0.85f, 1.1f, 1.0f)
+                    AnimatorSet().apply {
+                        playTogether(scaleX, scaleY)
+                        duration = 300
+                        interpolator = OvershootInterpolator(2f)
+                        start()
+                    }
+                }
+                oldId -> {
+                    // Animate deselected tab: subtle shrink
+                    iconView.imageTintList = ColorStateList.valueOf(colorInactive)
+                    titleView.setTextColor(colorInactive)
+
+                    val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1.0f, 0.9f, 1.0f)
+                    val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1.0f, 0.9f, 1.0f)
+                    AnimatorSet().apply {
+                        playTogether(scaleX, scaleY)
+                        duration = 200
+                        start()
+                    }
+                }
+                else -> {
+                    iconView.imageTintList = ColorStateList.valueOf(colorInactive)
+                    titleView.setTextColor(colorInactive)
+                }
+            }
+        }
+    }
+
+    private fun updateSelected(animate: Boolean = false) {
         val colorActive = context.tabBarActiveIconColor
         val colorInactive = context.tabBarInactiveIconColor
 
@@ -187,6 +247,6 @@ class BottomTabsView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(barHeight + bottomOffset, MeasureSpec.EXACTLY))
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(barHeight, MeasureSpec.EXACTLY))
     }
 }

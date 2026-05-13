@@ -13,17 +13,11 @@
                   <project path="$PROJECT_DIR$/buildLogic/plugin" />
                 </projects>
               </build>
-              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
-                <projects>
-                  <project path="$PROJECT_DIR$/buildSrc" />
-                </projects>
-              </build>
             </builds>
           </compositeBuild>
         </compositeConfiguration>
         <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -41,7 +35,10 @@
             <option value="$PROJECT_DIR$/apps/wallet/data/core" />
             <option value="$PROJECT_DIR$/apps/wallet/data/dapps" />
             <option value="$PROJECT_DIR$/apps/wallet/data/events" />
+            <option value="$PROJECT_DIR$/apps/wallet/data/features" />
+            <option value="$PROJECT_DIR$/apps/wallet/data/legacy" />
             <option value="$PROJECT_DIR$/apps/wallet/data/passcode" />
+            <option value="$PROJECT_DIR$/apps/wallet/data/plugins" />
             <option value="$PROJECT_DIR$/apps/wallet/data/purchase" />
             <option value="$PROJECT_DIR$/apps/wallet/data/rates" />
             <option value="$PROJECT_DIR$/apps/wallet/data/rn" />
@@ -49,6 +46,15 @@
             <option value="$PROJECT_DIR$/apps/wallet/data/staking" />
             <option value="$PROJECT_DIR$/apps/wallet/data/swap" />
             <option value="$PROJECT_DIR$/apps/wallet/data/tokens" />
+            <option value="$PROJECT_DIR$/apps/wallet/data/tx" />
+            <option value="$PROJECT_DIR$/apps/wallet/features" />
+            <option value="$PROJECT_DIR$/apps/wallet/features/core" />
+            <option value="$PROJECT_DIR$/apps/wallet/features/dapp" />
+            <option value="$PROJECT_DIR$/apps/wallet/features/embeded" />
+            <option value="$PROJECT_DIR$/apps/wallet/features/embeded/scanner" />
+            <option value="$PROJECT_DIR$/apps/wallet/features/ramp" />
+            <option value="$PROJECT_DIR$/apps/wallet/features/settings" />
+            <option value="$PROJECT_DIR$/apps/wallet/features/trading" />
             <option value="$PROJECT_DIR$/apps/wallet/instance" />
             <option value="$PROJECT_DIR$/apps/wallet/instance/app" />
             <option value="$PROJECT_DIR$/apps/wallet/instance/main" />
@@ -57,23 +63,33 @@
             <option value="$PROJECT_DIR$/baselineprofile/main" />
             <option value="$PROJECT_DIR$/buildLogic" />
             <option value="$PROJECT_DIR$/buildLogic/plugin" />
-            <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/kmp" />
+            <option value="$PROJECT_DIR$/kmp/async" />
             <option value="$PROJECT_DIR$/kmp/core" />
+            <option value="$PROJECT_DIR$/kmp/mvi" />
             <option value="$PROJECT_DIR$/kmp/ui" />
             <option value="$PROJECT_DIR$/lib" />
             <option value="$PROJECT_DIR$/lib/base64" />
             <option value="$PROJECT_DIR$/lib/blockchain" />
+            <option value="$PROJECT_DIR$/lib/bus" />
             <option value="$PROJECT_DIR$/lib/emoji" />
             <option value="$PROJECT_DIR$/lib/extensions" />
+            <option value="$PROJECT_DIR$/lib/features" />
             <option value="$PROJECT_DIR$/lib/icu" />
             <option value="$PROJECT_DIR$/lib/ledger" />
+            <option value="$PROJECT_DIR$/lib/log" />
             <option value="$PROJECT_DIR$/lib/network" />
             <option value="$PROJECT_DIR$/lib/qr" />
             <option value="$PROJECT_DIR$/lib/security" />
             <option value="$PROJECT_DIR$/lib/sqlite" />
             <option value="$PROJECT_DIR$/lib/ur" />
             <option value="$PROJECT_DIR$/tonapi" />
+            <option value="$PROJECT_DIR$/tonapi/battery" />
+            <option value="$PROJECT_DIR$/tonapi/core" />
+            <option value="$PROJECT_DIR$/tonapi/exchange" />
+            <option value="$PROJECT_DIR$/tonapi/legacy" />
+            <option value="$PROJECT_DIR$/tonapi/tonkeeper" />
+            <option value="$PROJECT_DIR$/tonapi/trading" />
             <option value="$PROJECT_DIR$/ui" />
             <option value="$PROJECT_DIR$/ui/blur" />
             <option value="$PROJECT_DIR$/ui/shimmer" />

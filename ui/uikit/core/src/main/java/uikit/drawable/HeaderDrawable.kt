@@ -3,14 +3,17 @@ package uikit.drawable
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Shader
 import com.tonapps.uikit.color.separatorCommonColor
 import uikit.base.BaseDrawable
 import uikit.extensions.dp
 
-class HeaderDrawable(context: Context): BarDrawable(context) {
+class HeaderDrawable(context: Context) : BarDrawable(context) {
 
     override val y: Float
         get() = bounds.bottom.toFloat()
-
 }

@@ -1,24 +1,34 @@
 package com.tonapps.tonkeeper.ui.screen.wallet.main
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.tonapps.tonkeeper.core.AnalyticsHelper
 import com.tonapps.tonkeeper.koin.walletViewModel
+import com.tonapps.tonkeeper.manager.wallpaper.WallpaperManager
 import com.tonapps.tonkeeper.ui.component.MainRecyclerView
 import com.tonapps.tonkeeper.ui.component.wallet.WalletHeaderView
+import com.tonapps.tonkeeper.ui.screen.camera.CameraScreen
 import com.tonapps.tonkeeper.ui.screen.main.MainScreen
 import com.tonapps.tonkeeper.ui.screen.wallet.picker.PickerScreen
 import com.tonapps.tonkeeper.ui.screen.settings.main.SettingsScreen
 import com.tonapps.tonkeeper.ui.screen.support.SupportScreen
 import com.tonapps.tonkeeper.ui.screen.wallet.main.list.Item.Status
 import com.tonapps.tonkeeper.ui.screen.wallet.main.list.WalletAdapter
+import com.tonapps.tonkeeper.ui.screen.watchonly.WatchInfoScreen
 import com.tonapps.tonkeeperx.R
-import com.tonapps.wallet.data.account.entities.WalletEntity
+import com.tonapps.blockchain.model.legacy.WalletEntity
+import com.tonapps.core.flags.WalletFeature
+import com.tonapps.tonkeeper.ui.screen.events.compose.history.TxEventsScreen
 import kotlinx.coroutines.flow.filterNotNull
 import uikit.drawable.BarDrawable
 import uikit.extensions.collectFlow
+import uikit.navigation.Navigation.Companion.navigation
 
 class WalletScreen(wallet: WalletEntity): MainScreen.Child(R.layout.fragment_wallet, wallet) {
 
@@ -31,6 +41,21 @@ class WalletScreen(wallet: WalletEntity): MainScreen.Child(R.layout.fragment_wal
     private lateinit var headerView: WalletHeaderView
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var listView: MainRecyclerView
+    private var wallpaperView: ImageView? = null
+    private var wallpaperDimView: View? = null
+
+    private val wallpaperManager by lazy { WallpaperManager(requireContext()) }
+
+    private val pickWallpaperLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                wallpaperManager.setWallpaper(uri)
+                applyWallpaper()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +64,25 @@ class WalletScreen(wallet: WalletEntity): MainScreen.Child(R.layout.fragment_wal
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        wallpaperView = view.findViewById(R.id.wallpaper)
+        wallpaperDimView = view.findViewById(R.id.wallpaper_dim)
+
         headerView = view.findViewById(R.id.header)
         headerView.onWalletClick = { navigation?.add(PickerScreen.newInstance(from = "wallet")) }
-        headerView.onSupportClick = { navigation?.add(SupportScreen.newInstance(wallet)) }
+        headerView.onSupportClick = {
+            if (wallet.isWatchOnly) {
+                navigation?.add(WatchInfoScreen.newInstance(wallet))
+            } else {
+                when {
+                    WalletFeature.NewRampFlow.isEnabled -> navigation?.add(CameraScreen.newInstance())
+                    else -> navigation?.add(SupportScreen.newInstance(wallet))
+                }
+            }
+        }
+        headerView.onHistoryClick = { navigation?.add(TxEventsScreen.newInstance(wallet)) }
+        headerView.setHistoryVisible(WalletFeature.TradingTab.isEnabled)
+
         headerView.onSettingsClick = { navigation?.add(SettingsScreen.newInstance(wallet, "wallet")) }
         headerView.doWalletSwipe = { right ->
             if (right) {
@@ -64,6 +105,47 @@ class WalletScreen(wallet: WalletEntity): MainScreen.Child(R.layout.fragment_wal
                 refreshLayout.isRefreshing = false
             }
         }
+
+        applyWallpaper()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applyWallpaper()
+    }
+
+    fun pickWallpaper() {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+        pickWallpaperLauncher.launch(intent)
+    }
+
+    fun removeWallpaper() {
+        wallpaperManager.removeWallpaper()
+        applyWallpaper()
+    }
+
+    fun setDimLevel(level: Float) {
+        wallpaperManager.dimLevel = level
+        applyWallpaper()
+    }
+
+    private fun applyWallpaper() {
+        if (wallpaperManager.isWallpaperSet) {
+            val bitmap = wallpaperManager.getWallpaperBitmap()
+            if (bitmap != null) {
+                wallpaperView?.setImageBitmap(bitmap)
+                wallpaperView?.visibility = View.VISIBLE
+                wallpaperDimView?.visibility = View.VISIBLE
+                val dim = wallpaperManager.dimLevel
+                val dimColor = Color.argb((255 * dim).toInt(), 0, 0, 0)
+                wallpaperDimView?.setBackgroundColor(dimColor)
+            }
+        } else {
+            wallpaperView?.visibility = View.GONE
+            wallpaperDimView?.visibility = View.GONE
+        }
     }
 
     override fun getRecyclerView(): RecyclerView? {
@@ -74,9 +156,7 @@ class WalletScreen(wallet: WalletEntity): MainScreen.Child(R.layout.fragment_wal
     }
 
     override fun getTopBarDrawable(): BarDrawable? {
-        if (this::headerView.isInitialized) {
-            return headerView.background as? BarDrawable
-        }
+        // Header now uses FooterDrawable (not BarDrawable), no divider needed for glass island
         return null
     }
 

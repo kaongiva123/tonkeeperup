@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/backgroundPageColor">
+
+    <uikit.widget.HeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        android:clipChildren="true">
+
+        <ImageView
+            android:id="@+id/wallpaper_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="gone"/>
+
+        <View
+            android:id="@+id/dim_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00000000"
+            android:visibility="gone"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="No wallpaper"
+            android:textAppearance="@style/TextAppearance.Label2"
+            android:textColor="?attr/textSecondaryColor"
+            android:id="@+id/no_wallpaper_label"/>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/dim_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.Label2"
+        android:textColor="?attr/textPrimaryColor"/>
+
+    <SeekBar
+        android:id="@+id/dim_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_pick_wallpaper"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:text="Choose Photo"
+        android:textAllCaps="false"
+        android:background="@drawable/bg_button_primary"
+        android:textColor="@color/constantWhite"
+        android:textAppearance="@style/TextAppearance.Label1"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_remove_wallpaper"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Remove Wallpaper"
+        android:textAllCaps="false"
+        android:background="@drawable/bg_button_secondary"
+        android:textColor="?attr/textPrimaryColor"
+        android:textAppearance="@style/TextAppearance.Label1"/>
+
+</LinearLayout>
