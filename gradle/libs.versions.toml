@@ -86,7 +86,7 @@ coil = "3.4.0"
 ton = "0.3.1"
 
 # DI
-koin = "4.2.0"
+koin = "4.2.1"
 
 # UI
 material = "1.13.0"
