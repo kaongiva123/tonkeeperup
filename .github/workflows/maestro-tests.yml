@@ -35,7 +35,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Download built APK artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.build-apk.outputs.artifact-name }}
           path: dist/apk
