@@ -74,7 +74,7 @@ google-play-installreferrer = "2.2"
 firebase-bom = "34.11.0"
 firebase-config = "23.0.1"
 firebase-services-plugin = "4.4.4"
-firebase-crashlytics-plugin = "3.0.6"
+firebase-crashlytics-plugin = "3.0.7"
 firebase-performance-plugin = "2.0.2"
 
 # Networking
